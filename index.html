@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Robin Extractor</title>
+<title>ROBE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -495,23 +495,20 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
   color: var(--text) !important;
 }
 
-/* ── Arrow Hint Animation ── */
-@keyframes pulseArrow {
-  0%, 100% {
-    transform: translateY(-50%) translateX(0);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(-50%) translateX(8px);
-    opacity: 0.7;
-  }
-}
 
 @media (max-width: 700px) {
   .stat-row { grid-template-columns: 1fr 1fr; }
   .str-tbl-head, .str-row { grid-template-columns: 100px 60px 1fr; }
   .str-tbl-head span:last-child, .str-row > *:last-child { display: none; }
 }
+
+/* ── Clickable Title ── */
+#animated-title {
+  cursor: pointer;
+  user-select: none;
+}
+#animated-title:hover { opacity: .85; }
+#animated-title:active { opacity: .65; }
 </style>
 </head>
 <body>
@@ -519,7 +516,7 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
 
   <!-- Header -->
   <div class="hdr" style="justify-content: center;">
-    <h1 id="animated-title" class="title-gradient-flow">
+    <h1 id="animated-title" class="title-gradient-flow" onclick="cycleLibrary()" title="Click to switch library">
       <span class="letter">R</span><span class="letter">o</span><span class="letter">b</span><span class="letter">i</span><span class="letter">n</span>
       <span class="letter space"> </span>
       <span class="letter">E</span><span class="letter">x</span><span class="letter">t</span><span class="letter">r</span><span class="letter">a</span><span class="letter">c</span><span class="letter">t</span><span class="letter">o</span><span class="letter">r</span>
@@ -560,9 +557,9 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
   <!-- Drop zone -->
   <div class="drop-zone" id="drop">
     <div class="drop-inner">
-      <span class="drop-icon">📦</span>
-      <div class="drop-title">Drop up to 250 .lib files here</div>
-      <div class="drop-desc">Or click to select multiple files — all parsing runs in your browser</div>
+      <span class="drop-icon" id="drop-icon">📦</span>
+      <div class="drop-title" id="drop-title">Drop up to 250 .lib files here</div>
+      <div class="drop-desc" id="drop-desc">Or click to select multiple files — all parsing runs in your browser</div>
       <button class="btn-primary" onclick="document.getElementById('fin').click()">⬆ Select Files</button>
       <button class="btn-primary" onclick="document.getElementById('dir-input').click()" style="margin-left: 10px">📁 Select Directory</button>
       <input type="file" id="fin" multiple accept=".lib,.a,.bin">
@@ -599,10 +596,7 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
     </div>
     <div style="position: relative;">
       <select class="sel" id="file-filter" onchange="onFileFilterChange()"><option value="">All files</option></select>
-      <!-- Пульсуюча стрілка-підказка -->
-      <div id="file-select-hint" style="display: none; position: absolute; left: -40px; top: 50%; transform: translateY(-50%); animation: pulseArrow 1.5s ease-in-out infinite;">
-        <div style="font-size: 28px; color: var(--green); text-shadow: 0 0 10px var(--green);">👉</div>
-      </div>
+
     </div>
     <select class="sel" id="cat-filter" onchange="applyFilters()">
       <option value="">All categories</option>
@@ -770,16 +764,24 @@ async function startBatch(files) {
   clearAll(true);
   if (!files || !files.length) return;
 
-  // Фільтруємо тільки .lib, .a, .bin файли
-  const validFiles = Array.from(files).filter(f => 
-    f.name.toLowerCase().endsWith('.lib') || 
-    f.name.toLowerCase().endsWith('.a') || 
-    f.name.toLowerCase().endsWith('.bin')
-  );
-  
-  if (!validFiles.length) {
-    alert('No valid .lib, .a, or .bin files found in the selected directory.');
-    return;
+  // Фільтруємо файли відповідно до поточного режиму бібліотеки
+  let validFiles;
+  if (currentLib === 'roxx') {
+    validFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.ckf'));
+    if (!validFiles.length) {
+      alert('No valid .ckf files found. In ROXX mode only .ckf files are supported.');
+      return;
+    }
+  } else {
+    validFiles = Array.from(files).filter(f =>
+      f.name.toLowerCase().endsWith('.lib') ||
+      f.name.toLowerCase().endsWith('.a')   ||
+      f.name.toLowerCase().endsWith('.bin')
+    );
+    if (!validFiles.length) {
+      alert('No valid .lib, .a, or .bin files found in the selected directory.');
+      return;
+    }
   }
 
   fileList = validFiles.slice(0, 250);
@@ -812,7 +814,11 @@ function processFile(file, idx) {
     reader.onload = e => {
       try {
         const buf = new Uint8Array(e.target.result);
-        parseLib(buf, file.name);
+        if (currentLib === 'roxx' || file.name.toLowerCase().endsWith('.ckf')) {
+          parseCkf(buf, file.name);
+        } else {
+          parseLib(buf, file.name);
+        }
       } catch(err) {
         console.error(file.name, err);
       }
@@ -863,7 +869,8 @@ function parseLib(buf, filename) {
                             hasEnoughLength && 
                             hasEnoughLetters && 
                             hasSpaces &&
-                            notTooManySpecialChars;
+                            notTooManySpecialChars &&
+                            !hasSequentialRun(trimmed);
     
     if (isVersionHeader) {
       // Зберігаємо як заголовок версії
@@ -936,6 +943,167 @@ function parseLib(buf, filename) {
   if (clLines.length > 0) {
     allChangelog.push({ file: filename, lines: clLines });
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CKF PARSER (ROXX — XOR 0x21 encoded)
+// ═══════════════════════════════════════════════════════════════
+function parseCkf(buf, filename) {
+  // CKF files are XOR-encoded with key 0x21
+  const decoded = new Uint8Array(buf.length);
+  for (let i = 0; i < buf.length; i++) decoded[i] = buf[i] ^ 0x21;
+
+  // Extract null-terminated strings from decoded buffer
+  const strings = extractStringsFromBuffer(decoded);
+
+  // State for cluster/board context
+  let clusterName = '';
+  const clLines = [];
+
+  // Try to get cluster name from filename: B2-FC-V1_4.CKF → B2-FC
+  const fnMatch = filename.match(/^([A-Z0-9\-]+?)[-_]V[\d_]+\.ckf$/i);
+  if (fnMatch) clusterName = fnMatch[1];
+
+  // Also look for 'CLUSTER ...' and 'SW.Vx.x' in decoded strings
+  let swVer = '', hwVer = '', bootVer = '';
+  const versionStrings = [];
+
+  for (const { offset, str } of strings) {
+    const trimmed = str.trim();
+
+    // Store all strings
+    const cat = categorizeCkf(trimmed);
+    allStrings.push({ file: filename, offset, str: trimmed, category: cat });
+
+    // Cluster name: "CLUSTER B2 FC"
+    const clusterM = trimmed.match(/^CLUSTER\s+(.+)$/i);
+    if (clusterM) clusterName = clusterM[1].trim();
+
+    // SW version: "SW.V1.4" or "V1.4"
+    const swM = trimmed.match(/^SW[.\s]*V?(\d+\.\d+[\d.]*)$/i);
+    if (swM) { swVer = swM[1]; versionStrings.push({ type: 'SW', ver: swM[1] }); }
+
+    // Standalone version like "V1.4", "V1.1" etc.
+    const verM = trimmed.match(/^V(\d+\.\d+[\d.]*)$/i);
+    if (verM && !swM) versionStrings.push({ type: 'VER', ver: verM[1] });
+
+    // BOOT versions
+    if (/^BOOT$/i.test(trimmed)) {
+      // Next few strings after BOOT are likely boot partition versions
+    }
+    const bootM = trimmed.match(/^BOOT\s+V?(\d+\.\d+)/i);
+    if (bootM) { bootVer = bootM[1]; versionStrings.push({ type: 'BOOT', ver: bootM[1] }); }
+
+    // Generic dotted versions
+    const genM = trimmed.match(/\bV?(\d+\.\d+[\d.]*)\b/i);
+    if (genM && trimmed.length < 20) versionStrings.push({ type: 'GENERAL', ver: genM[1] });
+
+    // Module-like strings (channel configs, features)
+    if (/strobe|dimmer|colour|color|fan|fixture|channel|macro|calibrat/i.test(trimmed) && trimmed.length > 3 && trimmed.length < 60) {
+      addResult({ file: filename, offset, raw: trimmed, category: 'MODULE', module: trimmed, ver: '', sw: swVer, hw: hwVer, pcb: clusterName });
+    }
+
+    // Changelog-like lines — строга фільтрація від бінарних/lookup даних
+    if (isHumanReadable(trimmed)) {
+      clLines.push(trimmed);
+    }
+  }
+
+  // Add version results
+  const pcb = clusterName || filename.replace(/\.ckf$/i, '');
+  const seenVers = new Set();
+  for (const v of versionStrings) {
+    if (seenVers.has(v.type + v.ver)) continue;
+    seenVers.add(v.type + v.ver);
+    if (v.type === 'SW') {
+      addResult({ file: filename, offset: 0, raw: `SW.V${v.ver}`, category: 'VERSION_SW', pcb, sw: v.ver, hw: hwVer, module: '', ver: `sw${v.ver}` });
+    } else if (v.type === 'BOOT') {
+      addResult({ file: filename, offset: 0, raw: `BOOT V${v.ver}`, category: 'GENERAL', pcb, sw: '', hw: '', module: 'BOOT', ver: `V${v.ver}` });
+    } else if (v.type === 'VER') {
+      addResult({ file: filename, offset: 0, raw: `V${v.ver}`, category: 'GENERAL', pcb, sw: '', hw: '', module: '', ver: `V${v.ver}` });
+    }
+  }
+
+  // If we found cluster but no SW ver from decoded strings, try filename
+  if (!swVer) {
+    const fvM = filename.match(/V([\d_]+)\.ckf$/i);
+    if (fvM) {
+      const fv = fvM[1].replace(/_/g, '.');
+      addResult({ file: filename, offset: 0, raw: `V${fv} (from filename)`, category: 'VERSION_SW', pcb, sw: fv, hw: '', module: '', ver: `sw${fv}` });
+    }
+  }
+
+  if (clLines.length > 0) allChangelog.push({ file: filename, lines: clLines });
+}
+
+function extractStringsFromBuffer(buf) {
+  const out = [];
+  let start = -1, cur = '';
+  for (let i = 0; i <= buf.length; i++) {
+    const b = i < buf.length ? buf[i] : 0;
+    const ok = b >= 0x20 && b <= 0x7E;
+    if (ok) { if (start < 0) start = i; cur += String.fromCharCode(b); }
+    else {
+      if (cur.length >= 3) out.push({ offset: start, str: cur.trim() });
+      start = -1; cur = '';
+    }
+  }
+  return out;
+}
+
+function categorizeCkf(str) {
+  if (/^SW[.\s]*V?\d/i.test(str)) return 'VERSION_SW';
+  if (/^BOOT/i.test(str)) return 'GENERAL';
+  if (/^V\d+\.\d+/i.test(str)) return 'GENERAL';
+  if (/CLUSTER/i.test(str)) return 'MODULE';
+  if (/strobe|dimmer|colour|color|fan|fixture/i.test(str)) return 'MODULE';
+  return 'STRING';
+}
+
+// Перевіряє чи є рядок читабельним текстом (не бінарний/lookup-таблиця)
+function hasSequentialRun(str, minRun = 6) {
+  let run = 1;
+  for (let i = 1; i < str.length; i++) {
+    const d = str.charCodeAt(i) - str.charCodeAt(i - 1);
+    if (d === 1 || d === -1) { if (++run >= minRun) return true; }
+    else run = 1;
+  }
+  return false;
+}
+
+function isHumanReadable(str) {
+  if (str.length < 5 || str.length > 120) return false;
+
+  // Мінімум 60% літер серед всіх символів
+  const letters = (str.match(/[a-zA-Z]/g) || []).length;
+  if (letters / str.length < 0.4) return false;
+
+  // Обов'язково є пробіл або це одне значуще слово >= 4 літер
+  const hasSpace = /\s/.test(str);
+  const words = str.trim().split(/\s+/);
+  if (!hasSpace && words[0].length < 4) return false;
+
+  // Відхиляємо послідовні ASCII-символи (lookup tables / gamma curves)
+  // Ознака: >= 6 символів підряд з різницею 1 або -1 (ascending/descending runs)
+  let runLen = 1;
+  for (let i = 1; i < str.length; i++) {
+    const diff = str.charCodeAt(i) - str.charCodeAt(i - 1);
+    if (diff === 1 || diff === -1) {
+      runLen++;
+      if (runLen >= 6) return false; // довга послідовна серія — бінарні дані
+    } else {
+      runLen = 1;
+    }
+  }
+
+  // Відхиляємо рядки де більше 30% символів не-алфавітні і не пробіл (крім . , - : /)
+  const noise = (str.match(/[^a-zA-Z0-9\s.,\-:/()'!?]/g) || []).length;
+  if (noise / str.length > 0.25) return false;
+
+  // Мінімум одне слово >= 3 літери поспіль
+  if (!/[a-zA-Z]{3}/.test(str)) return false;
+
+  return true;
 }
 
 function addResult(r) {
@@ -1236,10 +1404,6 @@ function buildFileFilter() {
 }
 
 function onFileFilterChange() {
-  // Ховаємо стрілку-підказку коли файл обрано
-  const hint = document.getElementById('file-select-hint');
-  if (hint) hint.style.display = 'none';
-  
   applyFilters();
   showFileChangelog();
 }
@@ -1408,7 +1572,7 @@ function changeAnimation(type) {
       break;
     case 'glitch':
       title.className = 'title-glitch';
-      title.setAttribute('data-text', 'Robin Extractor');
+      title.setAttribute('data-text', title.textContent.trim());
       break;
     case 'none':
       title.className = 'title-none';
@@ -1419,8 +1583,94 @@ function changeAnimation(type) {
   localStorage.setItem('titleAnimation', type);
 }
 
-// Ініціалізація при завантаженні
+// ═══════════════════════════════════════════════════════════════
+// LIBRARY SWITCHER
+// ═══════════════════════════════════════════════════════════════
+const LIBRARIES = {
+  robin:    { name: 'ROBE',      emoji: '📦' },
+  roxx:     { name: 'ROXX',      emoji: '🔵' },
+  claypaky: { name: 'Clay Paky', emoji: '🟡' },
+};
+const LIB_ORDER = ['robin', 'roxx', 'claypaky'];
+
+let currentLib = 'robin';
+
+function cycleLibrary() {
+  const idx = LIB_ORDER.indexOf(currentLib);
+  const nextLib = LIB_ORDER[(idx + 1) % LIB_ORDER.length];
+  switchLibrary(nextLib);
+}
+
+const LIB_CONFIG = {
+  robin:    { accept: '.lib,.a,.bin', title: 'Drop up to 250 .lib / .a / .bin files here', icon: '📦' },
+  roxx:     { accept: '.ckf',         title: 'Drop up to 250 .ckf files here',              icon: '🔵' },
+  claypaky: { accept: '.lib,.a,.bin', title: 'Drop up to 250 .lib / .a / .bin files here', icon: '🟡' },
+};
+
+function updateDropZone(lib) {
+  const cfg = LIB_CONFIG[lib];
+  document.getElementById('fin').accept = cfg.accept;
+  document.getElementById('drop-icon').textContent = cfg.icon;
+  document.getElementById('drop-title').textContent = cfg.title;
+}
+
+function switchLibrary(lib) {
+  currentLib = lib;
+
+  // Update body class for accent color
+  document.body.className = document.body.className.replace(/\bmode-\w+/g, '').trim();
+  document.body.classList.add('mode-' + lib);
+
+  // Update title text
+  setTitleText(LIBRARIES[lib].name);
+
+  // Update browser tab title
+  document.title = LIBRARIES[lib].name;
+
+  // Update drop zone
+  updateDropZone(lib);
+
+  // Зберігаємо вибір
+  localStorage.setItem('activeLibrary', lib);
+
+  // Clear data when switching library
+  clearAll();
+
+  // Re-apply current animation with new letters
+  const savedAnimation = localStorage.getItem('titleAnimation') || 'gradient-flow';
+  changeAnimation(savedAnimation);
+}
+
+function setTitleText(text) {
+  const title = document.getElementById('animated-title');
+  const currentClass = title.className;
+  title.innerHTML = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const span = document.createElement('span');
+    if (ch === ' ') {
+      span.className = 'letter space';
+      span.innerHTML = ' ';
+    } else {
+      span.className = 'letter';
+      span.textContent = ch;
+    }
+    title.appendChild(span);
+  }
+  // Restore class
+  title.className = currentClass;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  // Відновлюємо збережену бібліотеку
+  const savedLib = localStorage.getItem('activeLibrary') || 'robin';
+  currentLib = savedLib;
+  document.body.classList.add('mode-' + savedLib);
+  document.title = LIBRARIES[savedLib].name;
+  setTitleText(LIBRARIES[savedLib].name);
+  updateDropZone(savedLib);
+
   // Завантажуємо збережену анімацію
   const savedAnimation = localStorage.getItem('titleAnimation') || 'gradient-flow';
   const select = document.getElementById('animation-select');
