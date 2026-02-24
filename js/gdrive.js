@@ -57,6 +57,7 @@ function openGoogleDrivePicker() {
 
 // Creates a DocsView with MULTISELECT_ENABLED, title based on currentLib
 function showPicker() {
+  updateGdriveStatus(true);
   const isRoxx = currentLib === 'roxx';
   const title = isRoxx ? 'Select .ckf files' : 'Select .lib / .a / .bin files';
 
