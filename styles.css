@@ -487,10 +487,71 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
 }
 
 
-@media (max-width: 700px) {
-  .stat-row { grid-template-columns: 1fr 1fr; }
-  .str-tbl-head, .str-row { grid-template-columns: 100px 60px 1fr; }
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+  .wrap { padding: 20px 14px 60px; }
+
+  /* Header */
+  .hdr { margin-bottom: 20px; }
+  .hdr h1 { font-size: 26px; }
+
+  /* Drop zone — stack buttons vertically */
+  .drop-inner { padding: 28px 16px; }
+  .drop-icon { font-size: 32px; }
+  .drop-title { font-size: 15px; }
+  .btn-primary {
+    display: block;
+    width: 100%;
+    margin-left: 0 !important;
+    margin-bottom: 10px;
+  }
+
+  /* Saved directory — wrap path + actions */
+  .dir-header { flex-wrap: wrap; gap: 8px; }
+  .dir-path { width: 100%; }
+  .dir-actions { width: 100%; justify-content: flex-end; }
+
+  /* Stats — 2 columns */
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-box { min-width: unset; }
+  .stat-n { font-size: 22px; }
+
+  /* Tabs — scrollable strip */
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100% !important; }
+  .tab { padding: 7px 12px; font-size: 12px; flex-shrink: 0; }
+
+  /* Controls — wrap into rows */
+  .ctrl-bar { gap: 8px; }
+  .search-wrap { flex: 1 1 100%; min-width: unset; }
+  #file-filter { flex: 1 1 calc(50% - 4px); min-width: unset; }
+  #cat-filter  { flex: 1 1 calc(50% - 4px); min-width: unset; }
+  .ctrl-bar .btn-sec { flex: 1 1 calc(25% - 6px); min-height: 40px; padding: 8px 10px; font-size: 11px; text-align: center; }
+
+  /* Module grid — single column */
+  .mod-grid { grid-template-columns: 1fr; }
+
+  /* String table — hide last column */
+  .str-tbl-head, .str-row { grid-template-columns: 110px 60px 1fr; }
   .str-tbl-head span:last-child, .str-row > *:last-child { display: none; }
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 14px 10px 60px; }
+  .hdr h1 { font-size: 20px; }
+  .stat-n { font-size: 19px; }
+
+  /* Controls — selects full width, buttons 2 per row */
+  #file-filter { flex: 1 1 100%; }
+  #cat-filter  { flex: 1 1 100%; }
+  .ctrl-bar .btn-sec { flex: 1 1 calc(50% - 4px); }
+
+  /* Tabs — even tighter */
+  .tab { padding: 6px 10px; font-size: 11px; }
+
+  /* String table — show only offset + string */
+  .str-tbl-head, .str-row { grid-template-columns: 60px 1fr; }
+  .str-tbl-head span:nth-child(2),
+  .str-row > *:nth-child(2) { display: none; }
 }
 
 /* ── Clickable Title ── */
