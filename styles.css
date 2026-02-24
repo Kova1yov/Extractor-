@@ -127,27 +127,18 @@ body::before {
   border-radius: 8px; font-family: var(--ui); font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all .15s;
   display: inline-flex; align-items: center; gap: 8px;
+  position: relative;
 }
 .btn-gdrive:hover { border-color: #4285f4; color: #4285f4; background: rgba(66,133,244,.08); }
 .btn-gdrive:active { transform: translateY(1px); }
 
-/* ── Google Drive Status ── */
-.gdrive-status {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 8px; font-family: var(--ui); font-size: 12px;
-  color: var(--muted);
-}
+/* ── Google Drive Status Dot ── */
 .gdrive-dot {
+  position: absolute; top: 6px; right: 6px;
   width: 7px; height: 7px; border-radius: 50%;
-  background: var(--muted); flex-shrink: 0; transition: background .2s;
+  background: var(--muted); transition: background .2s;
 }
-.gdrive-status.connected { color: var(--green); }
-.gdrive-status.connected .gdrive-dot { background: var(--green); }
-.gdrive-signout {
-  cursor: pointer; opacity: .5; font-size: 11px;
-  padding: 1px 4px; border-radius: 3px; transition: opacity .15s;
-}
-.gdrive-signout:hover { opacity: 1; }
+.btn-gdrive.connected .gdrive-dot { background: var(--green); }
 
 /* ── Progress ── */
 .prog-wrap { padding: 14px 20px; border-top: 1px solid var(--border); display: none; background: var(--s2); }

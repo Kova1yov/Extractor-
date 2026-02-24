@@ -136,18 +136,11 @@ async function downloadAndProcessDriveFile(fileId, fileName) {
   }
 }
 
-// Updates gdrive-status element class and text
+// Updates the dot indicator inside the Google Drive button
 function updateGdriveStatus(signedIn) {
-  const el = document.getElementById('gdrive-status');
-  const text = document.getElementById('gdrive-status-text');
-  if (!el || !text) return;
-  if (signedIn) {
-    el.classList.add('connected');
-    text.textContent = 'Connected';
-  } else {
-    el.classList.remove('connected');
-    text.textContent = 'Not connected';
-  }
+  const btn = document.getElementById('btn-gdrive');
+  if (!btn) return;
+  btn.classList.toggle('connected', signedIn);
 }
 
 // Revokes token and resets status
