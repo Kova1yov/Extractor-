@@ -114,6 +114,12 @@ body::before {
 #fin { display: none; }
 #dir-input { display: none; }
 
+/* ── Drop buttons row ── */
+.drop-btns {
+  display: inline-flex; flex-wrap: wrap; justify-content: center;
+  gap: 10px; margin-top: 0;
+}
+
 /* ── Google Drive Button ── */
 .btn-gdrive {
   background: var(--s2); border: 1px solid var(--border2);
@@ -121,7 +127,6 @@ body::before {
   border-radius: 8px; font-family: var(--ui); font-size: 14px; font-weight: 700;
   cursor: pointer; transition: all .15s;
   display: inline-flex; align-items: center; gap: 8px;
-  margin-top: 10px;
 }
 .btn-gdrive:hover { border-color: #4285f4; color: #4285f4; background: rgba(66,133,244,.08); }
 .btn-gdrive:active { transform: translateY(1px); }
@@ -305,7 +310,7 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
 .err-row td { color: var(--red); font-size: 11px; padding: 6px 14px; }
 
 /* ── Count line ── */
-.count-line { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.count-line { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 .count-line b { color: var(--text); }
 
 /* ── Changelog ── */
@@ -529,18 +534,16 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
   .drop-inner { padding: 28px 16px; }
   .drop-icon { font-size: 32px; }
   .drop-title { font-size: 15px; }
-  .btn-primary {
-    display: block;
+  .drop-btns {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    margin-left: 0 !important;
-    margin-bottom: 10px;
+    gap: 10px;
   }
-  .btn-gdrive {
-    display: block;
+  .btn-primary, .btn-gdrive {
     width: 100%;
-    margin-left: 0 !important;
-    margin-bottom: 10px;
     justify-content: center;
+    margin-left: 0 !important;
   }
 
   /* Saved directory — wrap path + actions */
