@@ -50,6 +50,21 @@ function applyFilters() {
     });
   }
 
+  // Per (pcb, category) keep only the entry with the highest version
+  const latestMap = new Map();
+  rows.forEach(r => {
+    const key = r.pcb + '|' + r.category;
+    const existing = latestMap.get(key);
+    if (!existing) {
+      latestMap.set(key, r);
+    } else {
+      const currVer  = parseFloat(r.sw        || r.hw        || r.ver || '0');
+      const existVer = parseFloat(existing.sw || existing.hw || existing.ver || '0');
+      if (currVer > existVer) latestMap.set(key, r);
+    }
+  });
+  rows = [...latestMap.values()];
+
   rows = [...rows].sort((a,b) => {
     const av = a[sortCol] || '', bv = b[sortCol] || '';
     return av < bv ? -sortDir : av > bv ? sortDir : 0;
