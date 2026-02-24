@@ -10,7 +10,7 @@ function renderSummary() {
 
   document.getElementById('stat-row').innerHTML = `
     <div class="stat-box c1 fade-in"><div class="stat-n">${fileList.length}</div><div class="stat-l">Files processed</div></div>
-    <div class="stat-box c2 fade-in"><div class="stat-n">${mods}</div><div class="stat-l">forte_* modules</div></div>
+    <div class="stat-box c2 fade-in"><div class="stat-n">${hwVer}</div><div class="stat-l">HW versions</div></div>
     <div class="stat-box c3 fade-in"><div class="stat-n">${swVer}</div><div class="stat-l">SW versions</div></div>
     <div class="stat-box c4 fade-in"><div class="stat-n">${hwVer}</div><div class="stat-l">HW versions</div></div>
     <div class="stat-box c5 fade-in"><div class="stat-n">${clTot}</div><div class="stat-l">Changelog lines</div></div>
