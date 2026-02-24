@@ -6,7 +6,7 @@ function renderChangelogTab() {
   const el = document.getElementById('tab-changelog');
   if (!allChangelog.length) { el.innerHTML = '<div class="empty">No changelog entries detected.</div>'; return; }
 
-  const cards = allChangelog.map(c => {
+  const cards = [...allChangelog].reverse().map(c => {
     const lines = c.lines.map(l => {
       const hl = l.replace(/\b(v\d+[\d.]*|sw\s*\d+|hw\s*\d+|\bRB\d+v\d+)/gi, '<span class="cl-highlight">$1</span>');
       return `<div class="cl-line">${escH2(hl)}</div>`;

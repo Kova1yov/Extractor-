@@ -98,6 +98,10 @@ function buildFileFilter() {
     opt.value = f.name; opt.textContent = shortName(f.name);
     sel.appendChild(opt);
   });
+  if (fileList.length === 1) {
+    sel.value = fileList[0].name;
+    onFileFilterChange();
+  }
 }
 
 function onFileFilterChange() {
