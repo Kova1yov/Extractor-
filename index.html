@@ -109,10 +109,11 @@
       <option value="VERSION_SW" selected>SW Version</option>
       <option value="VERSION_HW">HW Version</option>
     </select>
-    <button class="btn-sec" id="btn-unique" onclick="toggleUnique()">Unique only</button>
-    <button class="btn-sec" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn-sec" onclick="exportJSON()">⬇ JSON</button>
-    <button class="btn-sec" onclick="clearAll()">✕ Clear</button>
+    <div style="margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <button class="btn-sec" id="btn-unique" onclick="toggleUnique()">Unique only</button>
+      <button class="btn-sec" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn-sec" onclick="clearAll()">✕ Clear</button>
+    </div>
   </div>
 
   <!-- Tab panels -->
