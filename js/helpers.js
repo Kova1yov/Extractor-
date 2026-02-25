@@ -30,6 +30,14 @@ function hasSequentialRun(str, minRun = 6) {
   return false;
 }
 
+function copyRow(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = '⎘'; btn.style.color = ''; }, 1500);
+  }).catch(() => {});
+}
+
 function addResult(r) {
   // Deduplicate by file+raw+ver combo
   const key = r.file + '|' + r.raw + '|' + r.ver;

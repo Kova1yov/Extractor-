@@ -30,29 +30,37 @@ function renderAll() {
   renderStringsTab();
   renderChangelogTab();
   buildFileFilter();
+  buildPcbFilter();
 }
 
 function showUI() {
   document.getElementById('summary').style.display = 'block';
   document.getElementById('tabs').style.display    = 'flex';
   document.getElementById('ctrl').style.display    = 'flex';
+  document.title = `ROBE — ${fileList.length} file${fileList.length === 1 ? '' : 's'}`;
 }
 
 function clearAll(silent) {
   allResults = []; allStrings = []; allModules = {}; allChangelog = []; fileList = [];
   addResult._seen = new Set();
   uniqueMode = false;
-  _pf = _ppct = _plbl = null; // reset cache on clear
+  _pf = _ppct = _plbl = null;
+  try { localStorage.removeItem('robe_session'); } catch(e) {}
   if (!silent) {
     document.getElementById('summary').style.display = 'none';
     document.getElementById('tabs').style.display    = 'none';
     document.getElementById('ctrl').style.display    = 'none';
     document.getElementById('pw').style.display      = 'none';
     document.getElementById('fin').value = '';
-    ['tab-versions','tab-modules','tab-strings','tab-changelog'].forEach(id => {
-      document.getElementById(id).innerHTML = '';
+    ['tab-versions','tab-modules','tab-strings','tab-changelog','tab-compare'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '';
     });
     const sel = document.getElementById('file-filter');
     if (sel) sel.innerHTML = '<option value="">All files</option>';
+    const pcbSel = document.getElementById('pcb-filter');
+    if (pcbSel) pcbSel.innerHTML = '<option value="">All PCBs</option>';
+    document.title = 'ROBE';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

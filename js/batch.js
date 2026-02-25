@@ -48,4 +48,19 @@ async function startBatch(files) {
 
   renderAll();
   showUI();
+  saveSession();
+}
+
+function saveSession() {
+  try {
+    localStorage.setItem('robe_session', JSON.stringify({
+      allResults,
+      allModules,
+      allChangelog,
+      fileNames: fileList.map(f => f.name),
+      ts: Date.now()
+    }));
+  } catch(e) {
+    try { localStorage.removeItem('robe_session'); } catch(e2) {}
+  }
 }

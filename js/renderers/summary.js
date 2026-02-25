@@ -25,6 +25,7 @@ function renderSummary() {
             <th onclick="setSort('category', event)">Type<span class="sort-ico">↕</span></th>
             <th onclick="setSort('pcb', event)">PCB<span class="sort-ico">↕</span></th>
             <th onclick="setSort('ver', event)">Version<span class="sort-ico">↕</span></th>
+            <th></th>
           </tr></thead>
           <tbody class="tbody-scroll" id="vtbody"></tbody>
         </table>

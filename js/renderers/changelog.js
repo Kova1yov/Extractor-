@@ -50,7 +50,7 @@ function showFileChangelog() {
     .map(line => {
       if (/^===\s*(.+)\s*===$/.test(line)) {
         const version = line.match(/^===\s*(.+)\s*===$/)[1];
-        return `<div style="font-family: var(--ui); font-size: 16px; font-weight: 700; color: var(--green); margin: 20px 0 10px 0; padding-bottom: 8px; border-bottom: 2px solid var(--border);">${escH(version)}</div>`;
+        return `<div style="font-family: var(--ui); font-size: 16px; font-weight: 700; color: var(--accent); margin: 20px 0 10px 0; padding-bottom: 8px; border-bottom: 2px solid var(--border);">${escH(version)}</div>`;
       }
 
       if (line === '') {
