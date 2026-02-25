@@ -55,11 +55,9 @@ function openGoogleDrivePicker() {
   });
 }
 
-// Creates a DocsView with MULTISELECT_ENABLED, title based on currentLib
+// Creates a DocsView with MULTISELECT_ENABLED
 function showPicker() {
   updateGdriveStatus(true);
-  const isRoxx = currentLib === 'roxx';
-  const title = isRoxx ? 'Select .ckf files' : 'Select .lib / .a / .bin files';
 
   const view = new google.picker.DocsView()
     .setIncludeFolders(true)
@@ -68,7 +66,7 @@ function showPicker() {
   const picker = new google.picker.PickerBuilder()
     .addView(view)
     .setOAuthToken(gdriveToken)
-    .setTitle(title)
+    .setTitle('Select .lib / .a / .bin files')
     .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
     .setCallback(pickerCallback)
     .build();
@@ -80,8 +78,7 @@ function showPicker() {
 async function pickerCallback(data) {
   if (data.action !== google.picker.Action.PICKED) return;
 
-  const isRoxx = currentLib === 'roxx';
-  const allowed = isRoxx ? ['.ckf'] : ['.lib', '.a', '.bin'];
+  const allowed = ['.lib', '.a', '.bin'];
 
   const selected = data.docs.filter(doc => {
     const name = doc.name.toLowerCase();
@@ -127,11 +124,7 @@ async function downloadAndProcessDriveFile(fileId, fileName) {
     );
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const buf = new Uint8Array(await resp.arrayBuffer());
-    if (currentLib === 'roxx' || fileName.toLowerCase().endsWith('.ckf')) {
-      parseCkf(buf, fileName);
-    } else {
-      parseLib(buf, fileName);
-    }
+    parseLib(buf, fileName);
   } catch (err) {
     console.error('Failed to download', fileName, err);
   }

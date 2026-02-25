@@ -11,13 +11,10 @@ document.getElementById('fin').addEventListener('change', e => startBatch(e.targ
 document.getElementById('dir-input').addEventListener('change', e => handleDirectorySelection(e.target.files));
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Restore saved library
-  const savedLib = localStorage.getItem('activeLibrary') || 'robin';
-  currentLib = savedLib;
-  document.body.classList.add('mode-' + savedLib);
-  document.title = LIBRARIES[savedLib].name;
-  setTitleText(LIBRARIES[savedLib].name);
-  updateDropZone(savedLib);
+  document.body.classList.add('mode-robin');
+  document.title = 'ROBE';
+  setTitleText('ROBE');
+  updateDropZone();
 
   // Restore saved animation
   const savedAnimation = localStorage.getItem('titleAnimation') || 'gradient-flow';
