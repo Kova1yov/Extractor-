@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+
+  <!-- Black background -->
+  <rect width="32" height="32" fill="#111111"/>
+
+  <!-- Red top bar — Robe signature -->
+  <rect x="0" y="0" width="32" height="3" fill="#e30613"/>
+
+  <!-- R stem -->
+  <rect x="5" y="5" width="5" height="22" fill="#ffffff"/>
+
+  <!-- R bowl top bar -->
+  <rect x="5" y="5" width="14" height="4" fill="#ffffff"/>
+
+  <!-- R bowl right side -->
+  <rect x="19" y="5" width="4" height="9" fill="#ffffff"/>
+
+  <!-- R bowl corner bottom-right -->
+  <rect x="15" y="14" width="4" height="4" fill="#ffffff"/>
+
+  <!-- R bowl bottom bar -->
+  <rect x="5" y="14" width="14" height="4" fill="#ffffff"/>
+
+  <!-- R leg diagonal -->
+  <polygon points="14,18 19,18 27,27 22,27" fill="#ffffff"/>
+
+  <!-- Red square marker bottom-right — Robe dot -->
+  <rect x="26" y="26" width="5" height="5" fill="#e30613"/>
+
+</svg>
