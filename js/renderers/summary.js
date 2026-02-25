@@ -21,10 +21,10 @@ function renderSummary() {
       <div class="tbl-scroll">
         <table class="main-tbl">
           <thead><tr>
-            <th onclick="setSort('file')">File<span class="sort-ico">↕</span></th>
-            <th onclick="setSort('category')">Type<span class="sort-ico">↕</span></th>
-            <th onclick="setSort('pcb')">PCB<span class="sort-ico">↕</span></th>
-            <th onclick="setSort('ver')">Version<span class="sort-ico">↕</span></th>
+            <th onclick="setSort('file', event)">File<span class="sort-ico">↕</span></th>
+            <th onclick="setSort('category', event)">Type<span class="sort-ico">↕</span></th>
+            <th onclick="setSort('pcb', event)">PCB<span class="sort-ico">↕</span></th>
+            <th onclick="setSort('ver', event)">Version<span class="sort-ico">↕</span></th>
           </tr></thead>
           <tbody class="tbody-scroll" id="vtbody"></tbody>
         </table>

@@ -20,6 +20,16 @@ function catBadge(cat) {
   return { VERSION_SW:'ver-sw', VERSION_HW:'ver-hw', MODULE:'ver-mod', DRIVER:'ver-drv', GENERAL:'ver-generic' }[cat] || 'ver-generic';
 }
 
+function hasSequentialRun(str, minRun = 6) {
+  let run = 1;
+  for (let i = 1; i < str.length; i++) {
+    const d = str.charCodeAt(i) - str.charCodeAt(i - 1);
+    if (d === 1 || d === -1) { if (++run >= minRun) return true; }
+    else run = 1;
+  }
+  return false;
+}
+
 function addResult(r) {
   // Deduplicate by file+raw+ver combo
   const key = r.file + '|' + r.raw + '|' + r.ver;

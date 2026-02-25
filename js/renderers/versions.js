@@ -84,11 +84,11 @@ function applyFilters() {
   }).join('');
 }
 
-function setSort(col) {
+function setSort(col, e) {
   if (sortCol === col) sortDir *= -1;
   else { sortCol = col; sortDir = 1; }
   document.querySelectorAll('.main-tbl th').forEach(th => th.classList.remove('sorted'));
-  event.target.closest('th').classList.add('sorted');
+  e.target.closest('th').classList.add('sorted');
   applyFilters();
 }
 
