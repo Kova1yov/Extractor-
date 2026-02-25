@@ -27,11 +27,26 @@ function extractStrings(buf) {
   return out;
 }
 
+// Compiled once — reused for every string in every file
+const _re1 = new RegExp(RE_FORTE.source,   'gi');
+const _re2 = new RegExp(RE_PCB_VER.source, 'gi');
+const _re3 = new RegExp(RE_SWVER.source,   'gi');
+const _re4 = new RegExp(RE_HWVER.source,   'gi');
+const _re5 = new RegExp(RE_VER_DOT.source, 'g');
+const _re6 = new RegExp(RE_DRIVER.source,  'gi');
+const _re7 = new RegExp(RE_RFORTE.source,  'gi');
+
+const _reShortVer    = /^[Vv]\d{1,3}$/;
+const _reDateVer     = /^\d{8}$/;
+const _reMarker      = /^[\s\t]*[\-\*•]/;
+const _reLetters     = /[a-zA-Z]/g;
+const _reSpecial     = /[^a-zA-Z0-9\s\-\*•(),./]/g;
+const _reSpaces      = /\s/;
+
 function parseLib(buf, filename) {
   const strings = extractStrings(buf);
-
   const clLines = [];
-  let currentVersionHeader = null;
+  let m;
 
   for (const { offset, str } of strings) {
     const cat = categorize(str);
@@ -39,25 +54,16 @@ function parseLib(buf, filename) {
 
     const trimmed = str.trim();
 
-    const isShortVersion = /^[Vv]\d{1,3}$/.test(trimmed);
-    const isDateVersion = /^\d{8}$/.test(trimmed);
-    const isVersionHeader = isShortVersion || isDateVersion;
+    const isVersionHeader = _reShortVer.test(trimmed) || _reDateVer.test(trimmed);
 
-    const startsWithMarker = /^[\s\t]*[\-\*•]/.test(trimmed);
-    const hasEnoughLength = trimmed.length >= 10;
-    const hasEnoughLetters = (trimmed.match(/[a-zA-Z]/g) || []).length >= 5;
-    const hasSpaces = /\s/.test(trimmed);
-    const notTooManySpecialChars = (trimmed.match(/[^a-zA-Z0-9\s\-\*•(),./]/g) || []).length < trimmed.length * 0.3;
-
-    const isChangelogLine = startsWithMarker &&
-                            hasEnoughLength &&
-                            hasEnoughLetters &&
-                            hasSpaces &&
-                            notTooManySpecialChars &&
+    const isChangelogLine = _reMarker.test(trimmed) &&
+                            trimmed.length >= 10 &&
+                            (trimmed.match(_reLetters) || []).length >= 5 &&
+                            _reSpaces.test(trimmed) &&
+                            (trimmed.match(_reSpecial) || []).length < trimmed.length * 0.3 &&
                             !hasSequentialRun(trimmed);
 
     if (isVersionHeader) {
-      currentVersionHeader = trimmed;
       clLines.push('');
       clLines.push(`=== ${trimmed} ===`);
     } else if (isChangelogLine) {
@@ -65,64 +71,55 @@ function parseLib(buf, filename) {
     }
 
     // ── forte_* modules ──
-    let m;
-    const re1 = new RegExp(RE_FORTE.source, 'gi');
-    while ((m = re1.exec(str)) !== null) {
+    _re1.lastIndex = 0;
+    while ((m = _re1.exec(str)) !== null) {
       const mod = 'forte_' + m[1].toLowerCase();
       const ver = parseInt(m[2], 10);
-      const key = mod;
-      if (!allModules[key]) allModules[key] = { module: mod, versions: [], files: [] };
-      if (!allModules[key].versions.includes(ver)) allModules[key].versions.push(ver);
-      if (!allModules[key].files.includes(filename)) allModules[key].files.push(filename);
+      if (!allModules[mod]) allModules[mod] = { module: mod, versions: [], files: [] };
+      if (!allModules[mod].versions.includes(ver)) allModules[mod].versions.push(ver);
+      if (!allModules[mod].files.includes(filename)) allModules[mod].files.push(filename);
       addResult({ file: filename, offset, raw: str, category: 'MODULE', module: mod, ver: 'v' + ver, sw: '', hw: '', pcb: '' });
     }
 
     // ── PCB sw/hw ──
-    const re2 = new RegExp(RE_PCB_VER.source, 'gi');
-    while ((m = re2.exec(str)) !== null) {
+    _re2.lastIndex = 0;
+    while ((m = _re2.exec(str)) !== null) {
       const pcb = m[1].replace(/\s+/g,' ').trim();
-      const verStr = m[2];
-      const pairs = verStr.split(',');
-      for (const pair of pairs) {
+      for (const pair of m[2].split(',')) {
         const swm = pair.match(/sw(\d+[\d.]*)/i);
         const hwm = pair.match(/hw(\d+[\d.]*)/i);
-        addResult({
-          file: filename, offset, raw: str, category: 'VERSION_SW',
-          pcb, sw: swm ? swm[1] : '', hw: hwm ? hwm[1] : '', module: '', ver: pair.trim()
-        });
+        addResult({ file: filename, offset, raw: str, category: 'VERSION_SW', pcb, sw: swm ? swm[1] : '', hw: hwm ? hwm[1] : '', module: '', ver: pair.trim() });
       }
     }
 
     // ── Standalone sw / hw ──
-    const re3 = new RegExp(RE_SWVER.source, 'gi');
-    while ((m = re3.exec(str)) !== null) {
+    _re3.lastIndex = 0;
+    while ((m = _re3.exec(str)) !== null) {
       addResult({ file: filename, offset, raw: str, category: 'VERSION_SW', sw: m[1], hw: '', pcb: '', module: '', ver: 'sw' + m[1] });
     }
-    const re4 = new RegExp(RE_HWVER.source, 'gi');
-    while ((m = re4.exec(str)) !== null) {
+    _re4.lastIndex = 0;
+    while ((m = _re4.exec(str)) !== null) {
       addResult({ file: filename, offset, raw: str, category: 'VERSION_HW', sw: '', hw: m[1], pcb: '', module: '', ver: 'hw' + m[1] });
     }
 
     // ── Generic dotted versions ──
-    const re5 = new RegExp(RE_VER_DOT.source, 'g');
-    while ((m = re5.exec(str)) !== null) {
+    _re5.lastIndex = 0;
+    while ((m = _re5.exec(str)) !== null) {
       addResult({ file: filename, offset, raw: str, category: 'GENERAL', ver: m[0], sw: '', hw: '', pcb: '', module: '' });
     }
 
     // ── Driver/device ──
-    const re6 = new RegExp(RE_DRIVER.source, 'gi');
-    while ((m = re6.exec(str)) !== null) {
+    _re6.lastIndex = 0;
+    while ((m = _re6.exec(str)) !== null) {
       addResult({ file: filename, offset, raw: str, category: 'DRIVER', ver: m[1] + 'v' + m[2], sw: '', hw: '', pcb: '', module: m[1] });
     }
 
     // ── rforte_ ──
-    const re7 = new RegExp(RE_RFORTE.source, 'gi');
-    while ((m = re7.exec(str)) !== null) {
+    _re7.lastIndex = 0;
+    while ((m = _re7.exec(str)) !== null) {
       addResult({ file: filename, offset, raw: str, category: 'MODULE', ver: m[0], module: m[0], sw: '', hw: '', pcb: '' });
     }
   }
 
-  if (clLines.length > 0) {
-    allChangelog.push({ file: filename, lines: clLines });
-  }
+  if (clLines.length > 0) allChangelog.push({ file: filename, lines: clLines });
 }

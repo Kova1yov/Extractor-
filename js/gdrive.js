@@ -103,16 +103,8 @@ async function pickerCallback(data) {
   setProgress(selected.length, selected.length, 'Complete');
   setTimeout(() => { document.getElementById('pw').style.display = 'none'; }, 600);
 
-  renderSummary();
-  renderVersionsTab();
-  renderModulesTab();
-  renderStringsTab();
-  renderChangelogTab();
-  buildFileFilter();
-
-  document.getElementById('summary').style.display = 'block';
-  document.getElementById('tabs').style.display = 'flex';
-  document.getElementById('ctrl').style.display = 'flex';
+  renderAll();
+  showUI();
 }
 
 // Fetches file content via Drive API and passes Uint8Array to the appropriate parser

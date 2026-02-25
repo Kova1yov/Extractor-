@@ -2,7 +2,6 @@
 // DIRECTORY HANDLING
 // ═══════════════════════════════════════════════════════════════
 
-let savedDirectoryHandle = null;
 let savedDirectoryPath = '';
 
 async function handleDirectorySelection(files) {
@@ -29,7 +28,7 @@ function updateDirectoryDisplay(path, fileCount) {
   infoDisplay.innerHTML = `📂 Directory saved. Found <b>${fileCount}</b> files. Click <b>Refresh</b> to reload files from this directory.`;
 }
 
-async function refreshDirectory() {
+function refreshDirectory() {
   if (!savedDirectoryPath) {
     alert('No directory saved. Please select a directory first.');
     return;
@@ -39,7 +38,6 @@ async function refreshDirectory() {
 
 function clearSavedDirectory() {
   savedDirectoryPath = '';
-  savedDirectoryHandle = null;
   localStorage.removeItem('savedDirectoryPath');
 
   const savedDirEl = document.getElementById('saved-dir');

@@ -46,14 +46,6 @@ async function startBatch(files) {
   setProgress(fileList.length, fileList.length, 'Complete');
   setTimeout(() => { document.getElementById('pw').style.display = 'none'; }, 600);
 
-  renderSummary();
-  renderVersionsTab();
-  renderModulesTab();
-  renderStringsTab();
-  renderChangelogTab();
-  buildFileFilter();
-
-  document.getElementById('summary').style.display = 'block';
-  document.getElementById('tabs').style.display   = 'flex';
-  document.getElementById('ctrl').style.display   = 'flex';
+  renderAll();
+  showUI();
 }

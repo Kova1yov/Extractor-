@@ -19,15 +19,8 @@ function applyFilters() {
     document.getElementById('count-v') && (document.getElementById('count-v').innerHTML =
       `<span style="color: var(--muted);">Select a file to display entries</span>`);
     filteredResults = [];
-
-    const hint = document.getElementById('file-select-hint');
-    if (hint) hint.style.display = 'block';
-
     return;
   }
-
-  const hint = document.getElementById('file-select-hint');
-  if (hint && fFile) hint.style.display = 'none';
 
   let rows = allResults;
   rows = rows.filter(r => r.pcb && r.pcb !== '—' && r.pcb.trim() !== '');
@@ -77,18 +70,18 @@ function applyFilters() {
 
   if (!rows.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No results match the current filter.</td></tr>'; return; }
 
-  tbody.innerHTML = rows.slice(0, 3000).map(r => `
-    <tr>
+  tbody.innerHTML = rows.slice(0, 3000).map(r => {
+    const badge = catBadge(r.category);
+    const verCell = r.sw ? `<span class="ver-badge ver-sw">sw${escH(formatSwVersion(r.sw))}</span>`
+                  : r.hw ? `<span class="ver-badge ver-hw">hw${escH(r.hw)}</span>`
+                  : `<span class="ver-badge ${badge}">${escH(r.ver)}</span>`;
+    return `<tr>
       <td class="td-file"><span title="${escH(r.file)}">${escH(shortName(r.file))}</span></td>
-      <td><span class="ver-badge ${catBadge(r.category)}">${escH(r.category.replace('VERSION_',''))}</span></td>
+      <td><span class="ver-badge ${badge}">${escH(r.category.replace('VERSION_',''))}</span></td>
       <td class="td-pcb">${escH(r.pcb || '—')}</td>
-      <td>
-        ${r.sw ? `<span class="ver-badge ver-sw">sw${escH(formatSwVersion(r.sw))}</span>` : ''}
-        ${r.hw ? `<span class="ver-badge ver-hw">hw${escH(r.hw)}</span>` : ''}
-        ${(!r.sw && !r.hw) ? `<span class="ver-badge ${catBadge(r.category)}">${escH(r.ver)}</span>` : ''}
-      </td>
-    </tr>
-  `).join('');
+      <td>${verCell}</td>
+    </tr>`;
+  }).join('');
 }
 
 function setSort(col) {
