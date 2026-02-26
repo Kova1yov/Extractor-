@@ -137,5 +137,5 @@ function buildFileFilter() {
 function onFileFilterChange() {
   buildPcbFilter();
   applyFilters();
-  showFileChangelog();
+  closeFileChangelog();
 }

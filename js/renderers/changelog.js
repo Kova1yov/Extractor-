@@ -17,6 +17,15 @@ function renderChangelogTab() {
   el.innerHTML = cards;
 }
 
+function toggleFileChangelog() {
+  const panel = document.getElementById('file-changelog-panel');
+  if (panel.style.display === 'block') {
+    closeFileChangelog();
+  } else {
+    showFileChangelog();
+  }
+}
+
 function showFileChangelog() {
   const selectedFile = document.getElementById('file-filter')?.value;
   const panel = document.getElementById('file-changelog-panel');
@@ -37,6 +46,16 @@ function showFileChangelog() {
     return;
   }
 
+  // Filter to last 2 versions
+  const allLines = fileChangelog.lines;
+  const versionIndices = [];
+  allLines.forEach((line, i) => {
+    if (/^===\s*.+\s*===$/.test(line)) versionIndices.push(i);
+  });
+  const sourceLines = versionIndices.length >= 2
+    ? allLines.slice(versionIndices[versionIndices.length - 2])
+    : allLines;
+
   function cleanText(text) {
     return text
       .replace(/[^\x20-\x7E\u00A0-\uFFFF]/g, '')
@@ -44,7 +63,7 @@ function showFileChangelog() {
       .trim();
   }
 
-  const lines = fileChangelog.lines
+  const lines = sourceLines
     .map(line => cleanText(line))
     .filter(line => line.length > 0)
     .map(line => {
