@@ -175,6 +175,9 @@ body::before {
   gap: 10px; flex-wrap: wrap; align-items: center;
 }
 .search-wrap { flex: 0.8; min-width: 160px; position: relative; }
+.file-filter-wrap { position: relative; flex: 0 0 auto; }
+.file-filter-wrap #file-filter { width: 100%; }
+.ctrl-buttons { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .search-wrap input {
   width: 100%; background: var(--s1); border: 1px solid var(--border2);
   color: var(--text); padding: 9px 14px 9px 38px;
@@ -585,9 +588,11 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
   /* Controls — wrap into rows */
   .ctrl-bar { gap: 8px; }
   .search-wrap { flex: 1 1 100%; min-width: unset; }
-  #file-filter { flex: 1 1 calc(50% - 4px); min-width: unset; }
-  #cat-filter  { flex: 1 1 calc(50% - 4px); min-width: unset; }
-  .ctrl-bar .btn-sec { flex: 1 1 calc(25% - 6px); min-height: 40px; padding: 8px 10px; font-size: 11px; text-align: center; }
+  .file-filter-wrap { flex: 1 1 calc(33% - 8px); min-width: 0; }
+  #cat-filter  { flex: 1 1 calc(33% - 8px); min-width: 0; }
+  #pcb-filter  { flex: 1 1 calc(33% - 8px); min-width: 0; }
+  .ctrl-buttons { flex: 1 1 100%; margin-left: 0; justify-content: stretch; }
+  .ctrl-buttons .btn-sec { flex: 1 1 calc(33% - 8px); min-height: 40px; padding: 8px 10px; font-size: 11px; text-align: center; }
 
   /* Module grid — single column */
   .mod-grid { grid-template-columns: 1fr; }
@@ -602,10 +607,11 @@ table.main-tbl td { padding: 10px 14px; vertical-align: middle; }
   .hdr h1 { font-size: 20px; }
   .stat-n { font-size: 19px; }
 
-  /* Controls — selects full width, buttons 2 per row */
-  #file-filter { flex: 1 1 100%; }
+  /* Controls — selects full width, buttons 3 per row */
+  .file-filter-wrap { flex: 1 1 100%; }
   #cat-filter  { flex: 1 1 100%; }
-  .ctrl-bar .btn-sec { flex: 1 1 calc(50% - 4px); }
+  #pcb-filter  { flex: 1 1 100%; }
+  .ctrl-buttons .btn-sec { flex: 1 1 calc(33% - 8px); }
 
   /* Tabs — even tighter */
   .tab { padding: 6px 10px; font-size: 11px; }

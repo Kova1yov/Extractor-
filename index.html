@@ -100,7 +100,7 @@
       <span class="search-ico">⌕</span>
       <input type="text" id="q" placeholder="Search..." oninput="applyFilters()">
     </div>
-    <div style="position: relative;">
+    <div class="file-filter-wrap">
       <select class="sel" id="file-filter" onchange="onFileFilterChange()"><option value="">All files</option></select>
     </div>
     <select class="sel" id="cat-filter" onchange="applyFilters()">
@@ -110,7 +110,7 @@
     <select class="sel" id="pcb-filter" onchange="applyFilters()">
       <option value="">All PCBs</option>
     </select>
-    <div style="margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+    <div class="ctrl-buttons">
       <button class="btn-sec" id="btn-unique" onclick="toggleUnique()">Unique only</button>
       <button class="btn-sec" onclick="exportCSV()">⬇ CSV</button>
       <button class="btn-sec" onclick="clearAll()">✕ Clear</button>
