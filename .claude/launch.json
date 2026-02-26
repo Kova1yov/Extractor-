@@ -4,7 +4,7 @@
     {
       "name": "Static Dev Server",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "3000", "--directory", "/Users/car-service/Documents/Projects/Extractor-/.claude/worktrees/nice-einstein"],
+      "runtimeArgs": ["-m", "http.server", "3000", "--directory", "/Users/car-service/Documents/Projects/Extractor-"],
       "port": 3000
     }
   ]
