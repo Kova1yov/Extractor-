@@ -78,10 +78,6 @@ function showFileChangelog() {
 
   filename.textContent = selectedFile;
   panel.style.display = 'block';
-
-  setTimeout(() => {
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 100);
 }
 
 function closeFileChangelog() {
