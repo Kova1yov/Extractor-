@@ -91,6 +91,7 @@
   <div class="tabs" id="tabs">
     <button class="tab active" onclick="switchTab('versions', this)">🔢 Versions</button>
     <button class="tab" onclick="closeFileChangelog(); switchTab('changelog', this)">📋 Changelog</button>
+    <button class="tab" onclick="switchTab('compare', this); renderCompareTab()">⟺ Compare</button>
   </div>
 
   <!-- Controls -->
@@ -99,14 +100,17 @@
       <span class="search-ico">⌕</span>
       <input type="text" id="q" placeholder="Search..." oninput="applyFilters()">
     </div>
-    <div style="position: relative;">
+    <div class="file-filter-wrap">
       <select class="sel" id="file-filter" onchange="onFileFilterChange()"><option value="">All files</option></select>
     </div>
     <select class="sel" id="cat-filter" onchange="applyFilters()">
       <option value="VERSION_SW" selected>SW Version</option>
       <option value="VERSION_HW">HW Version</option>
     </select>
-    <div style="margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+    <select class="sel" id="pcb-filter" onchange="applyFilters()">
+      <option value="">All PCBs</option>
+    </select>
+    <div class="ctrl-buttons">
       <button class="btn-sec" id="btn-unique" onclick="toggleUnique()">Unique only</button>
       <button class="btn-sec" onclick="exportCSV()">⬇ CSV</button>
       <button class="btn-sec" onclick="clearAll()">✕ Clear</button>
@@ -118,6 +122,7 @@
   <div id="tab-modules"  class="tab-panel"></div>
   <div id="tab-strings"  class="tab-panel"></div>
   <div id="tab-changelog" class="tab-panel"></div>
+  <div id="tab-compare"  class="tab-panel"></div>
 
   <!-- File Changelog Panel -->
   <div id="file-changelog-panel" style="display: none; margin-top: 20px;">
@@ -151,6 +156,7 @@
 <script src="js/renderers/strings.js"></script>
 <script src="js/renderers/changelog.js"></script>
 <script src="js/renderers/summary.js"></script>
+<script src="js/renderers/compare.js"></script>
 <!-- Features -->
 <script src="js/export.js"></script>
 <script src="js/ui.js"></script>

@@ -43,4 +43,23 @@ window.addEventListener('DOMContentLoaded', () => {
       selector.style.display = selector.style.display === 'none' ? 'block' : 'none';
     }
   });
+
+  // Restore previous session
+  restoreSession();
 });
+
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem('robe_session');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (!s.allResults?.length || !s.fileNames?.length) return;
+    allResults   = s.allResults;
+    allModules   = s.allModules   || {};
+    allChangelog = s.allChangelog || [];
+    fileList     = s.fileNames.map(n => ({ name: n }));
+    addResult._seen = new Set(allResults.map(r => r.file + '|' + r.raw + '|' + r.ver));
+    renderAll();
+    showUI();
+  } catch(e) {}
+}
