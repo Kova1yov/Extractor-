@@ -42,6 +42,7 @@ const _reMarker      = /^[\s\t]*[\-\*•]/;
 const _reLetters     = /[a-zA-Z]/g;
 const _reSpecial     = /[^a-zA-Z0-9\s\-\*•(),./]/g;
 const _reSpaces      = /\s/;
+const _reWord        = /[a-zA-Z]{3,}/;
 
 function parseLib(buf, filename) {
   const strings = extractStrings(buf);
@@ -61,7 +62,8 @@ function parseLib(buf, filename) {
                             (trimmed.match(_reLetters) || []).length >= 5 &&
                             _reSpaces.test(trimmed) &&
                             (trimmed.match(_reSpecial) || []).length < trimmed.length * 0.3 &&
-                            !hasSequentialRun(trimmed);
+                            !hasSequentialRun(trimmed) &&
+                            _reWord.test(trimmed);
 
     if (isVersionHeader) {
       clLines.push('');
